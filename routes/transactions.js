@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.get("/", getTransactions);
-router.get("/:referenceTime", getNewTransactions);
+router.get("/refresh/:referenceTime", getNewTransactions);
 router.post("/", doTransaction);
 router.patch("/:id", updateTransaction);
 router.delete("/:id", deleteTransaction);

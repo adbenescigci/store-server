@@ -2,8 +2,12 @@ import Transaction from "../models/transaction.js";
 import mongoose from "mongoose";
 
 export const getTransactions = async (req, res) => {
+  let queryStr = JSON.stringify(req.query);
+  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
+  let query = JSON.parse(queryStr);
+
   try {
-    const transactions = await Transaction.find();
+    const transactions = await Transaction.find(query);
     res.status(200).json(transactions);
   } catch (error) {
     res.status(400).json({
@@ -11,6 +15,7 @@ export const getTransactions = async (req, res) => {
     });
   }
 };
+
 export const getNewTransactions = async (req, res) => {
   const { referenceTime } = req.params;
   try {
@@ -37,14 +42,14 @@ export const doTransaction = async (req, res) => {
     });
   }
 };
+
 export const updateTransaction = async (req, res) => {
   const { id: _id } = req.params;
-  const transaction = { ...req.body, processTime: Date.now() };
-  console.log(transaction);
 
   if (!mongoose.Types.ObjectId.isValid(_id))
     return res.status(404).send("No post with that id");
 
+  const transaction = { ...req.body, processTime: Date.now() };
   const updatedTransaction = await Transaction.findByIdAndUpdate(
     _id,
     transaction,
