@@ -1,19 +1,15 @@
 import Transaction from "../models/transaction.js";
 import mongoose from "mongoose";
+import { getAll } from "../utils/query.js";
 
 export const getTransactions = async (req, res) => {
-  let queryStr = JSON.stringify(req.query);
-  queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-  let query = JSON.parse(queryStr);
-  try {
-    let time = Date.now();
-    const transactions = await Transaction.find(query);
-    res.status(200).json({ transactions, time });
-  } catch (error) {
+  let time = Date.now();
+  const transactions = await getAll(Transaction, req.query);
+  if (!transactions.message) res.status(200).json({ transactions, time });
+  else
     res.status(400).json({
-      message: error.message,
+      message: transactions.message,
     });
-  }
 };
 
 export const doTransaction = async (req, res) => {
