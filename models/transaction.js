@@ -7,24 +7,16 @@ const transactionSchema = mongoose.Schema({
   },
   description: String,
   user: String,
-  transactionType: {
+  subTransactions: [
+    {
+      type: mongoose.Schema.ObjectId,
+      ref: "SubTransaction",
+    },
+  ],
+  payment: [String],
+  paymentType: {
     type: String,
-    enum: ["alis", "satis"],
-  },
-  weight: {
-    type: Number,
-  },
-  work: Number,
-  goldSetting: {
-    type: Number,
-    enum: [22, 18, 14, 24, 8],
-    default: 22,
-  },
-  goldType: String,
-  amount: Number,
-  currency: {
-    type: String,
-    enum: ["TL", "USD", "Euro", "gram"],
+    enum: ["cash", "card"],
   },
   isDeleted: {
     type: Boolean,
@@ -33,6 +25,7 @@ const transactionSchema = mongoose.Schema({
 
   transactionTime: {
     type: Date,
+    default: Date.now(),
   },
   processTime: {
     type: Date,
@@ -49,6 +42,13 @@ transactionSchema.pre("save", function (next) {
 // QUERY MIDDLEWARE
 transactionSchema.pre(/^find/, function (next) {
   this.find({ isDeleted: false });
+  next();
+});
+transactionSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: "subTransactions",
+    select: "transactionType amount workmanship goldSetting goldType",
+  });
   next();
 });
 

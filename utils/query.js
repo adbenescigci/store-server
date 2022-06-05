@@ -1,3 +1,5 @@
+//RESULT WITH all req.query
+
 export const getAll = (Model, reqQuery) => {
   const queryObj = { ...reqQuery };
   const excludedFields = ["page", "sort", "limit", "fields"];
@@ -23,4 +25,24 @@ export const getAll = (Model, reqQuery) => {
   } catch (error) {
     return error;
   }
+};
+
+//TAKE CHILD ID BEFORE SAVE PARENT
+export const getChildIds = (children, id, Model) => {
+  let result = [];
+  children.forEach((el) => {
+    const child = new Model({
+      transaction: id,
+      ...el,
+    });
+    try {
+      child.save();
+    } catch (error) {
+      res.status(409).json({
+        message: error.message,
+      });
+    }
+    result.push(child._id);
+  });
+  return result;
 };
