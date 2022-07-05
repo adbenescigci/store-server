@@ -4,6 +4,7 @@ import {
   getTransaction,
   doTransaction,
   updateTransaction,
+  refreshTransactions,
   deleteTransaction,
   deleteAllTransactions,
 } from "../controllers/transactions.js";
@@ -11,6 +12,7 @@ import {
 const router = express.Router();
 
 router.get("/", getTransactions);
+router.get("/refresh", refreshTransactions);
 router.get("/:id", getTransaction);
 router.post("/", doTransaction);
 router.patch("/:id", updateTransaction);

@@ -1,10 +1,7 @@
 import mongoose from "mongoose";
 
 const transactionSchema = mongoose.Schema({
-  title: {
-    type: "String",
-    required: [true, "A transaction must have title"],
-  },
+  title: String,
   description: String,
   user: String,
   subTransactions: [
@@ -13,16 +10,12 @@ const transactionSchema = mongoose.Schema({
       ref: "SubTransaction",
     },
   ],
-  payment: [String],
-  paymentType: {
-    type: String,
-    enum: ["cash", "card"],
-  },
+  payment: Number,
   isDeleted: {
     type: Boolean,
     default: false,
   },
-
+  aproxProfit: Number,
   transactionTime: {
     type: Date,
     default: Date.now(),
@@ -40,10 +33,12 @@ transactionSchema.pre("save", function (next) {
 });
 
 // QUERY MIDDLEWARE
-transactionSchema.pre(/^find/, function (next) {
-  this.find({ isDeleted: false });
-  next();
-});
+
+// transactionSchema.pre(/^find/, function (next) {
+//   this.find({ isDeleted: false });
+//   next();
+// });
+
 transactionSchema.pre(/^find/, function (next) {
   this.populate({
     path: "subTransactions",

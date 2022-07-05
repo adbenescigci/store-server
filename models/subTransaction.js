@@ -1,24 +1,21 @@
 import mongoose from "mongoose";
-
 const subTransactionSchema = mongoose.Schema({
-  //PARENT ID
   transaction: {
     type: mongoose.Schema.ObjectId,
     ref: "Transactions",
     required: [true, "SubTransaction must belong to a transaction"],
   },
-  transactionType: {
-    type: String,
-    enum: ["alis", "satis"],
-  },
+  transactionType: String,
   amount: Number,
-  workmanship: Number,
-  goldSetting: {
-    type: Number,
-    enum: [24, 22, 18, 14, 8],
-    default: 22,
-  },
-  goldType: String,
+  weight: Number,
+  history: String,
+  label: String,
+  id: Number,
+  unit: String,
+  type: String,
+  amount: Number,
+  worship: Number,
+  setting: Number,
 });
 
 //DOCUMENT MIDDLEWARE

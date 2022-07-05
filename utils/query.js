@@ -1,6 +1,6 @@
 //RESULT WITH all req.query
 
-export const getAll = (Model, reqQuery) => {
+export const getAll = async (Model, reqQuery) => {
   const queryObj = { ...reqQuery };
   const excludedFields = ["page", "sort", "limit", "fields"];
   excludedFields.forEach((el) => delete queryObj[el]);
@@ -14,9 +14,8 @@ export const getAll = (Model, reqQuery) => {
   const page = reqQuery.page * 1 || 1;
   const limit = reqQuery.limit * 1 || 100;
   const skip = (page - 1) * limit;
-
   try {
-    const result = Model.find(query)
+    const result = await Model.find(query)
       .sort(sortBy)
       .select(fields)
       .skip(skip)
