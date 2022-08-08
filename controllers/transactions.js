@@ -57,6 +57,8 @@ export const getTransaction = async (req, res) => {
 
 export const doTransaction = async (req, res) => {
   const transaction = req.body;
+  let array = [];
+
   const newTransaction = new Transaction(transaction);
 
   newTransaction.subTransactions = getChildIds(
@@ -64,6 +66,21 @@ export const doTransaction = async (req, res) => {
     newTransaction._id,
     SubTransaction
   );
+  //For easily search we put all values in array
+  transaction.subTransactions.forEach(
+    (el) => (array = [...array, ...Object.values(el)])
+  );
+  transaction.subTransactions = "";
+  newTransaction.search = [
+    ...new Set([
+      ...array,
+      ...Object.values(transaction),
+      ...transaction?.description.split(" "),
+    ]),
+  ]
+    .toString()
+    .toLowerCase()
+    .split(",");
 
   try {
     await newTransaction.save();

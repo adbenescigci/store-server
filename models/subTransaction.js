@@ -14,7 +14,7 @@ const subTransactionSchema = mongoose.Schema({
   unit: String,
   type: String,
   amount: Number,
-  worship: Number,
+  workship: Number,
   setting: Number,
 });
 

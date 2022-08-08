@@ -1,30 +1,40 @@
 import mongoose from "mongoose";
 
-const transactionSchema = mongoose.Schema({
-  title: String,
-  description: String,
-  user: String,
-  subTransactions: [
-    {
-      type: mongoose.Schema.ObjectId,
-      ref: "SubTransaction",
+const transactionSchema = mongoose.Schema(
+  {
+    title: String,
+    description: String,
+    user: String,
+    subTransactions: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "SubTransaction",
+      },
+    ],
+    payment: { cash: Number, card: Number }, // TL
+    claim: Number, // gr
+    search: Array,
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
-  ],
-  payment: Number,
-  isDeleted: {
-    type: Boolean,
-    default: false,
+    earn: Number, // TL
+    sumAlis: Number, // gr
+    sumSatis: Number, // gr
+    transactionTime: {
+      type: Date,
+      default: Date.now(),
+    },
+    processTime: {
+      type: Date,
+      default: Date.now(),
+    },
   },
-  aproxProfit: Number,
-  transactionTime: {
-    type: Date,
-    default: Date.now(),
-  },
-  processTime: {
-    type: Date,
-    default: Date.now(),
-  },
-});
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
+);
 
 //DOCUMENT MIDDLEWARE
 transactionSchema.pre("save", function (next) {
@@ -42,7 +52,7 @@ transactionSchema.pre("save", function (next) {
 transactionSchema.pre(/^find/, function (next) {
   this.populate({
     path: "subTransactions",
-    select: "transactionType amount workmanship goldSetting goldType",
+    select: "-id -transaction",
   });
   next();
 });
