@@ -16,6 +16,7 @@ export const getTransactions = async (req, res) => {
     res.status(400).json({
       message: transactions.message,
     });
+  console.log(transactions.message, "test");
 };
 export const refreshTransactions = async (req, res) => {
   let time = Date.now();
