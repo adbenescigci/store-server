@@ -1,7 +1,7 @@
-import Transaction from "../models/transaction.js";
-import SubTransaction from "../models/subTransaction.js";
-import mongoose from "mongoose";
-import { getAll, getChildIds } from "../utils/query.js";
+import Transaction from '../models/transaction.js';
+import SubTransaction from '../models/subTransaction.js';
+import mongoose from 'mongoose';
+import { getAll, getChildIds } from '../utils/query.js';
 
 // For error detection from getAll function
 // we look whether the result error or not, if error =>  it should have message property,
@@ -16,7 +16,6 @@ export const getTransactions = async (req, res) => {
     res.status(400).json({
       message: transactions.message,
     });
-  console.log(transactions.message, "test");
 };
 export const refreshTransactions = async (req, res) => {
   let time = Date.now();
@@ -24,7 +23,7 @@ export const refreshTransactions = async (req, res) => {
   const transactions = await getAll(Transaction, req.query);
 
   //DETERMINE DELETED ITEMS IDs TO SEND FRONT END TO REMOVE FROM STATE
-  req.query.isDeleted = "true";
+  req.query.isDeleted = 'true';
   const deleted = await getAll(Transaction, req.query);
   if (deleted.length > 0) {
     deleted.forEach((el) => {
@@ -44,7 +43,7 @@ export const getTransaction = async (req, res) => {
   const { id: _id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(_id))
-    return res.status(404).send("No post with that id");
+    return res.status(404).send('No post with that id');
 
   try {
     const transaction = await Transaction.findById(_id);
@@ -71,17 +70,17 @@ export const doTransaction = async (req, res) => {
   transaction.subTransactions.forEach(
     (el) => (array = [...array, ...Object.values(el)])
   );
-  transaction.subTransactions = "";
+  transaction.subTransactions = '';
   newTransaction.search = [
     ...new Set([
       ...array,
       ...Object.values(transaction),
-      ...transaction?.description.split(" "),
+      ...transaction?.description.split(' '),
     ]),
   ]
     .toString()
     .toLowerCase()
-    .split(",");
+    .split(',');
 
   try {
     await newTransaction.save();
@@ -96,7 +95,7 @@ export const doTransaction = async (req, res) => {
 export const updateTransaction = async (req, res) => {
   const { id: _id } = req.params;
   if (!mongoose.Types.ObjectId.isValid(_id))
-    return res.status(404).send("No post with that id");
+    return res.status(404).send('No post with that id');
 
   const transaction = { ...req.body, processTime: Date.now() };
   const updatedTransaction = await Transaction.findByIdAndUpdate(
@@ -113,13 +112,13 @@ export const deleteTransaction = async (req, res) => {
   const { id: _id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(_id))
-    return res.status(404).send("No post with that id");
+    return res.status(404).send('No post with that id');
   await Transaction.findByIdAndRemove(_id);
-  res.json({ message: "transaction deleted succesfully" });
+  res.json({ message: 'transaction deleted succesfully' });
 };
 
 export const deleteAllTransactions = async (req, res) => {
   await Transaction.remove({});
   await SubTransaction.remove({});
-  res.json({ message: "transactions deleted succesfully" });
+  res.json({ message: 'transactions deleted succesfully' });
 };
