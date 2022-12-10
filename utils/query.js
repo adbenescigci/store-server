@@ -4,11 +4,10 @@ export const getAll = async (Model, reqQuery) => {
   const queryObj = { ...reqQuery };
   const excludedFields = ["page", "sort", "limit", "fields", "filter"];
   excludedFields.forEach((el) => delete queryObj[el]);
-
+  console.log(queryObj, reqQuery, "server/query");
   let queryStr = JSON.stringify(queryObj);
   queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
   let query = JSON.parse(queryStr);
-  let filter = JSON.parse(reqQuery.filter);
 
   const sortBy = reqQuery.sort?.split(",").join(" ") || "-processTime";
   const fields = reqQuery.fields?.split(",").join(" ") || "-__v";
@@ -31,7 +30,7 @@ export const getAll = async (Model, reqQuery) => {
   // );
 
   // console.log(str);
-  console.log(query, filter);
+  //console.log(query, filter);
 
   try {
     const result = await Model.find(query)
