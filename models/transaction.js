@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const transactionSchema = mongoose.Schema(
   {
@@ -8,7 +8,7 @@ const transactionSchema = mongoose.Schema(
     subTransactions: [
       {
         type: mongoose.Schema.ObjectId,
-        ref: "SubTransaction",
+        ref: 'SubTransaction',
       },
     ],
     payment: { cash: Number, card: Number }, // TL
@@ -35,9 +35,12 @@ const transactionSchema = mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+transactionSchema.index({ search: 'text' });
+transactionSchema.index({ description: 'text' });
 
 //DOCUMENT MIDDLEWARE
-transactionSchema.pre("save", function (next) {
+
+transactionSchema.pre('save', function (next) {
   this.processTime = Date.now();
   next();
 });
@@ -51,12 +54,12 @@ transactionSchema.pre("save", function (next) {
 
 transactionSchema.pre(/^find/, function (next) {
   this.populate({
-    path: "subTransactions",
-    select: "-id -transaction",
+    path: 'subTransactions',
+    select: '-id -transaction',
   });
   next();
 });
 
-const Transaction = mongoose.model("Transaction", transactionSchema);
+const Transaction = mongoose.model('Transaction', transactionSchema);
 
 export default Transaction;

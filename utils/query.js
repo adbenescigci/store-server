@@ -2,6 +2,7 @@
 
 export const getAll = async (Model, reqQuery) => {
   const queryObj = { ...reqQuery };
+  const filter = JSON.parse(reqQuery?.filter || null);
   const excludedFields = ['page', 'sort', 'limit', 'fields', 'filter'];
   excludedFields.forEach((el) => delete queryObj[el]);
 
@@ -14,18 +15,57 @@ export const getAll = async (Model, reqQuery) => {
   const page = reqQuery.page * 1 || 1;
   const limit = reqQuery.limit * 1 || 100;
   const skip = (page - 1) * limit;
-  let filter = undefined;
 
-  if (reqQuery?.filter) filter = JSON.parse(reqQuery?.filter);
-  console.log(filter, query);
-  // const programs = await Program.find({
-  //   $or: [{ students: _id }, { manager: _id }, { director: _id }],
-  // });
+  //FILTER OBJECT
+  let filterObject = {};
+  if (filter) {
+    let transTypes = [];
+    let payTypes = [];
 
-  // and operator (max,min,goldTYpes,transtypes,paymenttypes)
+    filter?.transTypes?.forEach((el) => {
+      const type = `sum${el.replace('ş', 's').replace('ı', 'i')}`;
+      transTypes.push({
+        $and: [
+          { [`${type}`]: { $lt: filter.max } },
+          { [`${type}`]: { $gt: filter.min } },
+        ],
+      });
+    });
+
+    filter?.paymentTypes?.forEach((el) => {
+      const type = `payment.${el == 'Nakit' ? 'cash' : 'card'}`;
+      payTypes.push({ [`${type}`]: { $gt: 0 } });
+    });
+
+    filterObject =
+      filter?.search !== ''
+        ? {
+            $and: [
+              { $text: { $search: filter?.search } },
+              {
+                $or: transTypes,
+              },
+              {
+                $or: payTypes,
+              },
+            ],
+          }
+        : {
+            $and: [
+              {
+                $or: transTypes,
+              },
+              {
+                $or: payTypes,
+              },
+            ],
+          };
+  }
 
   try {
-    const result = await Model.find(query)
+    const result = await Model.find(
+      !filter ? query : { ...query, ...filterObject }
+    )
       .sort(sortBy)
       .select(fields)
       .skip(skip)
