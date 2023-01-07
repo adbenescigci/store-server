@@ -37,29 +37,18 @@ export const getAll = async (Model, reqQuery) => {
       payTypes.push({ [`${type}`]: { $gt: 0 } });
     });
 
-    filterObject =
-      filter?.search !== ''
-        ? {
-            $and: [
-              { $text: { $search: filter?.search } },
-              {
-                $or: transTypes,
-              },
-              {
-                $or: payTypes,
-              },
-            ],
-          }
-        : {
-            $and: [
-              {
-                $or: transTypes,
-              },
-              {
-                $or: payTypes,
-              },
-            ],
-          };
+    filterObject = {
+      $and: [
+        {
+          $or: transTypes,
+        },
+        {
+          $or: payTypes,
+        },
+      ],
+    };
+    if (filter?.search.trim() !== '')
+      filterObject = { ...filterObject, $text: { $search: filter?.search } };
   }
 
   try {
